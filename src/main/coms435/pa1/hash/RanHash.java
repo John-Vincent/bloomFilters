@@ -10,14 +10,18 @@ public class RanHash extends BFHash
 
     private long p;
 
+    private int max;
+
     @Override
     public BitSet getHash()
     {
-        BitSet ans = new BitSet();
+        BitSet ans = new BitSet((int)p-1);
         //this may be redundant but I don't really care to look
         ans.clear();
-        int x = this.s.hashCode();
+        int x = Math.abs(this.s.hashCode());
         int i = (int)((a*x + b)%p);
+        //this is to make sure that the bitset is at most the size of the BitSet in the filter
+        i = i % this.max;
         ans.set(i);
         return ans;
     }
@@ -25,7 +29,8 @@ public class RanHash extends BFHash
     @Override
     public void generateFunction(int t, int N, double k)
     {
-        this.p = nextPrime(t*N);
+        this.max = t*N;
+        this.p = nextPrime(max);
         this.a = (long)(Math.random() * Long.MAX_VALUE);
         this.a = this.a % this.p;
         this.b = (long) (Math.random() * Long.MAX_VALUE);
@@ -52,5 +57,11 @@ public class RanHash extends BFHash
             if(p%i == 0 ) return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "p: " + p + "\na: " + a + "\nb: " + b + "\ns Hash: " + Math.abs(s.hashCode());
     }
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Executors;
@@ -11,20 +12,16 @@ import coms435.pa1.hash.BFHash;
 
 public abstract class BloomFilterAbstract implements BloomFilter
 {
-    private static final int NUMBER_OF_THREADS = 10;
-
     private static final String INT_EXP_ERR = "getting BitSet from hashing thread was interrupted" +
     " if these interruptions keep happening the program will be stuck in an infinite loop";
 
     protected static final double LN_2 = Math.log(2);
 
-    private LinkedBlockingQueue<BitSet> queue;
-
     private BitSet table;
 
     private Collection<BFHash> hashes;
 
-    private ExecutorService threads;
+    private  static ExecutorService threads = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private int elements;
 
@@ -37,8 +34,7 @@ public abstract class BloomFilterAbstract implements BloomFilter
         this.table = new BitSet(setSize * bitsPerElement);
         this.setSize = setSize;
         this.bitsPerElement = bitsPerElement;
-        this.queue = new LinkedBlockingQueue<BitSet>();
-        this.threads = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+        this.hashes = new ArrayList<BFHash>();
         //set all arrays indecies to false
         this.table.clear();
     }
@@ -51,11 +47,11 @@ public abstract class BloomFilterAbstract implements BloomFilter
         for (double i = 0; i < size; i++) {
             try {
                 h = c.newInstance();
-                h.setQueue(this.queue);
                 h.generateFunction(bitsPerElement, setSize, size);
                 hashes.add(h);
             } catch (Exception e) {
-                System.out.println(e.getMessage() + "\n exception creating hash function instance");
+                e.printStackTrace();
+                System.out.println("\n exception creating hash function instance");
 
             }
         }
@@ -69,7 +65,8 @@ public abstract class BloomFilterAbstract implements BloomFilter
     public void add(String s)
     {
         BitSet b;
-        this.startHash(s);
+        LinkedBlockingQueue<BitSet> queue = new LinkedBlockingQueue<BitSet>();
+        this.startHash(s, queue);
         for(int i = 0; i < hashes.size(); i++)
         {
             try
@@ -96,23 +93,15 @@ public abstract class BloomFilterAbstract implements BloomFilter
     public boolean appears(String s)
     {
         boolean ans = true;
-        BitSet b;
-        int i = 0;
-        this.startHash(s);
+        BFHash h;
+        Iterator<BFHash> it = hashes.iterator();
         //checks if the index returned from each hash function is set in the table
         //if the index is not set the loop exits and returns false
-        while(i < this.hashes.size() && ans)
+        while(it.hasNext() && ans)
         {
-            try
-            {
-                b = queue.take();
-                ans = b.intersects(this.table);
-                i++;
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(INT_EXP_ERR);
-            }
+            h = it.next();
+            h.setString(s);
+            ans = h.getHash().intersects(this.table);
         }
         return ans;
     }
@@ -122,14 +111,15 @@ public abstract class BloomFilterAbstract implements BloomFilter
      * hashing functinos in this.hashes
      * @param s
      */
-    private void startHash(String s)
+    private void startHash(String s, LinkedBlockingQueue<BitSet> queue)
     {
         BFHash h;
         Iterator<BFHash> it = hashes.iterator();
         while (it.hasNext()) {
             h = it.next();
             h.setString(s);
-            this.threads.execute(h);
+            h.setQueue(queue);
+            threads.execute(h);
         }
     }
 
@@ -162,5 +152,10 @@ public abstract class BloomFilterAbstract implements BloomFilter
     public int numHashes()
     {
         return this.hashes.size();
+    }
+
+    public static  void shutdown()
+    {
+        threads.shutdown();
     }
 }
