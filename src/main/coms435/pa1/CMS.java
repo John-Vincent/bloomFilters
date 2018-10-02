@@ -29,22 +29,20 @@ public class CMS
         this.s = s;
         for(int i = 0; i < this.hashes.length; i++)
         {
-            this.hashes[i] = new RanHash();
-            this.hashes[i].generateFunction(this.counters[0].length, 80, 1);
+            this.hashes[i] = new MurHash();
+            this.hashes[i].generateFunction(this.counters[0].length, 1, 1);
             this.hashes[i].setQueue(queue);
         }
-        System.out.println();
         for(int i = 0; i < s.size(); i++)
         {
             startHash(s.get(i));
-            System.out.print("\033[1Aadding string " + i + " of " + s.size() + " " + s.get(i) +  "        \n");
+            System.out.print("adding string " + (i+1) + " of " + s.size() + "\r");
             for(int j = 0; j < this.hashes.length; j++)
             {
-                System.out.print("taking hash number " + j + "    \r");
                 try
                 {
                     hash = this.queue.take();
-                    this.counters[hash[1]][hash[0] % this.counters[0].length]++;
+                    this.counters[hash[1]][hash[0]]++;
                 }
                 catch(Exception e)
                 {
@@ -52,6 +50,7 @@ public class CMS
                 }
             }
         }
+        System.out.println();
     }
 
     public int approximateFrequency(String x)
@@ -65,7 +64,7 @@ public class CMS
             try
             {
                 hash = queue.take();
-                index = hash[0] % this.counters[hash[1]].length;
+                index = hash[0];
                 ans = ans < this.counters[hash[1]][index] ? ans : this.counters[hash[1]][index];
             }
             catch(Exception e)
@@ -89,7 +88,7 @@ public class CMS
             if(!ans.contains(s.get(i)))
             {
                 frequency = this.approximateFrequency(s.get(i));
-                if(frequency >= qn && frequency < rn)
+                if(frequency >= qn && frequency >= rn)
                 {
                     ans.add(s.get(i));
                 }
@@ -111,6 +110,23 @@ public class CMS
             ans += "\n";
         }
         return ans;
+    }
+
+    public int averageFrequency()
+    {
+        int size = s.size();
+        int sum = 0;
+
+        for (int i = 0; i < s.size(); i++)
+        {
+                sum += this.approximateFrequency(s.get(i));
+        }
+        return sum/size;
+    }
+
+    public void shutdown()
+    {
+        threads.shutdown();
     }
 
     /**

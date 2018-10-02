@@ -1,6 +1,7 @@
 package coms435.pa1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
@@ -40,7 +41,7 @@ public class Pa1Test
 
         fillArrayList(f);
         CMS cms = new CMS(e, d, s);
-        System.out.println(cms);
+        System.out.println("approx unique strings: " + cms.averageFrequency() + "\n tears: " + cms.approximateFrequency("tears") + "\nand: " + cms.approximateFrequency("and"));
 
         for(int i = 3; i < args.length; i+=2)
         {
@@ -58,6 +59,7 @@ public class Pa1Test
             }
             heavyHitter(cms, q, r);
         }
+        cms.shutdown();
     }
 
     public static void approx(CMS cms)
@@ -78,7 +80,8 @@ public class Pa1Test
     {
         String string;
         String t;
-        Pattern p = Pattern.compile("[a-zA-Z0-9'\\-]{3,}");
+        HashMap<String,Integer> h = new HashMap<String,Integer>();
+        Pattern p = Pattern.compile("[a-zA-Z0-9']{3,}");
         Matcher m;
         try {
             BufferedReader reader = Files.newBufferedReader(f.toPath());
@@ -87,8 +90,12 @@ public class Pa1Test
                 m = p.matcher(string);
                 while(m.find())
                 {
-                    t = m.group();
-                    if(!t.toLowerCase().equals("the"))
+                    t = m.group().toLowerCase();
+                    if(h.get(t) == null)
+                        h.put(t,1);
+                    else
+                        h.put(t, h.get(t) + 1);
+                    if(!t.equals("the"))
                         s.add(t);
                 }
                 string = reader.readLine();
@@ -96,5 +103,7 @@ public class Pa1Test
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(h.keySet().size());
+        System.out.println(s.get(s.size()/2) + ": " + h.get(s.get(s.size()/2)) + "\nand: " + h.get("and") );
     }
 }

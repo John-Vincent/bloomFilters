@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class FilterTest
 {
     private static ArrayList<String> file = new ArrayList<String>();
-    private static final int NUM_STRINGS = 10000;
+    private static final int NUM_STRINGS = 100000;
 
     public static boolean RanTest()
     {
