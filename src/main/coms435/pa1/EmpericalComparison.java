@@ -1,9 +1,9 @@
 package main;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import main.coms435.pa1.differential.BloomDifferential;
 import main.coms435.pa1.differential.NaiveDifferential;
@@ -29,17 +29,16 @@ public class EmpericalComparison {
 	
 	public ArrayList<String> getKeys(String path) {
 		ArrayList<String> keys = new ArrayList<String>();
-		File file = new File(path);
 		try {
-			Scanner diffScanner = new Scanner(file);
-			while(diffScanner.hasNextLine()) {
-				String s = diffScanner.nextLine();
-				keys.add(s);
+			BufferedReader br = new BufferedReader(new FileReader(path));
+    		String line = "";
+			while((line=br.readLine())!=null) {
+				keys.add(line);
 			}
-			diffScanner.close();
+			br.close();
 			return keys;
-		} catch (FileNotFoundException e) {
-			System.out.println("Could not find grams.txt");
+		} catch (IOException e) {
+			System.out.println("Could not find the key file");
 			e.printStackTrace();
 		}
 		return null;
@@ -93,20 +92,15 @@ public class EmpericalComparison {
 		return new NaiveDifferential(diffFilePath,databaseFilePath);
 	}
 	
-	public static void main(String[] args) {
-		EmpericalComparison comp = new EmpericalComparison("C:\\easyKeys.txt","C:\\DiffFile.txt", "C:\\database.txt",100000,4);
-		System.out.println("FNV Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomFNV()));
-		System.out.println("Murmur Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomMurmur()));
+	public static void main(String[] args) throws InterruptedException {
+		EmpericalComparison comp = new EmpericalComparison("C:\\combinedKeys.txt","C:\\DiffFile.txt", "C:\\database.txt",400000,4);
+		System.out.println("Naive Differential average time in ns: " + comp.averageNaiveTime(comp.getNaiveDiff()));
+		Thread.sleep(1000);
 		System.out.println("Ran Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomRan()));
-		System.out.println("Naive Differential average time in ns: " + comp.averageNaiveTime(comp.getNaiveDiff()));	
-		
-		//trying to figure out why it wont work
-		BloomFilterFNV filter = new BloomFilterFNV(200000, 4);
-		BloomDifferential FNV4 = new BloomDifferential(filter, "C:\\DiffFile.txt", "C:\\database.txt");
-		NaiveDifferential ndiff = new NaiveDifferential("C:\\DiffFile.txt", "C:\\database.txt");
-		System.out.println(FNV4.retrieveRecord("are_VERB ,_. 3_NUM ,_."));
-		System.out.println(ndiff.retrieveRecord("are_VERB ,_. 3_NUM ,_."));
-		//120000-125000
+		Thread.sleep(1000);
+		System.out.println("FNV Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomFNV()));
+		Thread.sleep(1000);
+		System.out.println("Murmur Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomMurmur()));
 		
 	}
 }
