@@ -64,15 +64,13 @@ public abstract class BloomFilterAbstract implements BloomFilter
      */
     public void add(String s)
     {
-        BitSet b;
-        LinkedBlockingQueue<BitSet> queue = new LinkedBlockingQueue<BitSet>();
+        LinkedBlockingQueue<int[]> queue = new LinkedBlockingQueue<int[]>();
         this.startHash(s, queue);
         for(int i = 0; i < hashes.size(); i++)
         {
             try
             {
-                b = queue.take();
-                this.table.or(b);
+                this.table.set(queue.take()[0]);
             }
             catch(InterruptedException e)
             {
@@ -101,7 +99,7 @@ public abstract class BloomFilterAbstract implements BloomFilter
         {
             h = it.next();
             h.setString(s);
-            ans = h.getHash().intersects(this.table);
+            ans = this.table.get(h.getHash());
         }
         return ans;
     }
@@ -111,7 +109,7 @@ public abstract class BloomFilterAbstract implements BloomFilter
      * hashing functinos in this.hashes
      * @param s
      */
-    private void startHash(String s, LinkedBlockingQueue<BitSet> queue)
+    private void startHash(String s, LinkedBlockingQueue<int[]> queue)
     {
         BFHash h;
         Iterator<BFHash> it = hashes.iterator();

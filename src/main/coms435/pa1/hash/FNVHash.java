@@ -18,10 +18,8 @@ public class FNVHash extends BFHash
     }
 
     @Override
-    public BitSet getHash()
+    public int getHash()
     {
-        BitSet b;
-        int index;
         long hash = this.offset;
         byte[] bytes = this.s.getBytes();
 
@@ -30,10 +28,7 @@ public class FNVHash extends BFHash
             hash = hash * FNVHash.prime;
             hash = hash ^ bytes[i];
         }
-        index = Math.abs((int)hash) % p;
-        b = new BitSet(index);
-        b.set(index);
-        return b;
+        return Math.abs((int)hash) % p;
     }
 
 

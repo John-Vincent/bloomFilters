@@ -1,10 +1,10 @@
-package main.coms435.pa1.differential;
+package coms435.pa1.differential;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import main.coms435.pa1.filter.BloomFilter;
+import coms435.pa1.filter.BloomFilter;
 
 
 public class BloomDifferential
@@ -13,8 +13,8 @@ public class BloomDifferential
     private String diffPath;
   //bits per element at 4, 8, or 10
     private String databasePath;
-    
-    
+
+
     public BloomDifferential(BloomFilter filter, String diffPath, String databasePath)
     {
     	this.filter = filter;
@@ -51,7 +51,7 @@ public class BloomDifferential
 			System.out.println("Could not find DiffFile.txt");
 			e.printStackTrace();
 		}
-    	
+
     	return filter;
     }
 
@@ -71,7 +71,7 @@ public class BloomDifferential
 				}
 				diffScanner.close();
 			} catch (FileNotFoundException e) {
-				
+
 				e.printStackTrace();
 			}
         }

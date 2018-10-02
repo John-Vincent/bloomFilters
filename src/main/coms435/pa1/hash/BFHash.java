@@ -6,18 +6,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class BFHash implements Runnable
 {
 
-    private LinkedBlockingQueue<BitSet> queue;
+    private LinkedBlockingQueue<int[]> queue;
 
-    protected String s;
+    protected volatile String s;
+
+    private volatile int index = 0;
 
     public void run()
     {
-        this.queue.add(this.getHash());
+        this.queue.add(new int[]{this.getHash(), this.index});
     }
 
-    public void setQueue(LinkedBlockingQueue<BitSet> q)
+    public void setQueue(LinkedBlockingQueue<int[]> q)
     {
         this.queue = q;
+    }
+
+    public void setIndex(int i)
+    {
+        this.index = i;
     }
 
     public void setString(String s)
@@ -30,8 +37,8 @@ public abstract class BFHash implements Runnable
 
     }
 
-    public BitSet getHash()
+    public int getHash()
     {
-        return new BitSet();
+        return 0;
     }
 }

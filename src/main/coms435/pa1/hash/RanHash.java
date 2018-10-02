@@ -13,17 +13,12 @@ public class RanHash extends BFHash
     private int max;
 
     @Override
-    public BitSet getHash()
+    public int getHash()
     {
-        BitSet ans = new BitSet((int)p-1);
-        //this may be redundant but I don't really care to look
-        ans.clear();
         int x = Math.abs(this.s.hashCode());
         int i = (int)((a*x + b)%p);
         //this is to make sure that the bitset is at most the size of the BitSet in the filter
-        i = i % this.max;
-        ans.set(i);
-        return ans;
+        return i % this.max;
     }
 
     @Override

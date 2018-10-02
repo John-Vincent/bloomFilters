@@ -1,4 +1,4 @@
-package main.coms435.pa1.differential;
+package coms435.pa1.differential;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,14 +8,14 @@ public class NaiveDifferential
 {
 	private String databasePath;
 	private String diffPath;
-	
+
 	public NaiveDifferential(String diffPath, String databasePath)
     {
-    	
+
     	this.diffPath = diffPath;
     	this.databasePath = databasePath;
     }
-	
+
 	public Object retrieveRecord(String key) {
 		try {
 			//or path to DiffFile.txt

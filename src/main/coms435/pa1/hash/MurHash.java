@@ -18,12 +18,9 @@ public class MurHash extends BFHash
     }
 
     @Override
-    public BitSet getHash()
+    public int getHash()
     {
-        int a = Math.abs((int)MurmurHash.hash64(this.s.getBytes(), this.s.length(), this.seed)) % p;
-        BitSet b = new BitSet(a);
-        b.set(a);
-        return b;
+        return Math.abs((int)MurmurHash.hash64(this.s.getBytes(), this.s.length(), this.seed)) % p;
     }
 
 }
