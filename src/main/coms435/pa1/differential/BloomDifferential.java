@@ -1,10 +1,10 @@
-package main.coms435.pa1.differential;
+package coms435.pa1.differential;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-import main.coms435.pa1.filter.BloomFilter;
+import coms435.pa1.filter.BloomFilter;
 
 
 public class BloomDifferential
@@ -25,16 +25,15 @@ public class BloomDifferential
 
     public BloomFilter createFilter(BloomFilter filter)
     {
-    	//or path to the file
-    	File file = new File(diffPath);
     	try {
-			Scanner diffScanner = new Scanner(file);
-			while(diffScanner.hasNextLine()) {
-				String s = diffScanner.nextLine();
+    		BufferedReader br = new BufferedReader(new FileReader(diffPath));
+    		String line = "";
+			//int linesEntered = 0;
+			while((line=br.readLine())!=null) {
 				int numCount = 0;
 				int charCount = 0;
-				for(int i = 0; i<s.length();i++) {
-					if(Character.isDigit(s.charAt(i))){
+				for(int i = 0; i<line.length();i++) {
+					if(Character.isDigit(line.charAt(i))){
 						numCount++;
 					}else {
 						numCount = 0;
@@ -44,11 +43,14 @@ public class BloomDifferential
 					}
 					charCount++;
 				}
-				String key = s.substring(0, charCount-4);
+				String key = line.substring(0, charCount-4);
 				filter.add(key);
+				//linesEntered++;
+				
 			}
-			diffScanner.close();
-		} catch (FileNotFoundException e) {
+			//System.out.println("lines entered in filter: "+ linesEntered);
+			br.close();
+		} catch (IOException e) {
 			System.out.println("Could not find DiffFile.txt");
 			e.printStackTrace();
 		}
@@ -59,36 +61,39 @@ public class BloomDifferential
     public Object retrieveRecord(String key)
     {
         if(filter.appears(key)) {
-        	File file = new File(diffPath);
-			Scanner diffScanner;
+			//int linesSearched = 0;
 			try {
-				diffScanner = new Scanner(file);
-				while(diffScanner.hasNextLine()) {
-					String line = diffScanner.nextLine();
+				BufferedReader br = new BufferedReader(new FileReader(diffPath));
+	    		String line = "";
+				while((line=br.readLine())!=null) {
+					//linesSearched++;
 					if(line.contains(key)) {
-						diffScanner.close();
+						br.close();
 						return line;
 					}
 				}
-				diffScanner.close();
-			} catch (FileNotFoundException e) {
+				//System.out.println("lines searched in diff: "+ linesSearched);
+				br.close();
+			} catch (IOException e) {
 				
 				e.printStackTrace();
 			}
         }
         try {
-        	File database = new File(databasePath);
-			Scanner dbScanner = new Scanner(database);
-			while(dbScanner.hasNextLine()) {
-				String line = dbScanner.nextLine();
+			//int linesSearched = 0;
+			BufferedReader br = new BufferedReader(new FileReader(databasePath));
+    		String line = "";
+			while((line=br.readLine())!=null) {
+				//linesSearched++;
 				if(line.contains(key)) {
-					dbScanner.close();
+					br.close();
 					return line;
 				}
 			}
-			dbScanner.close();
+			br.close();
+			//System.out.println("lines searched in database: "+ linesSearched);
 			System.out.println("Key does not exist in database");
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
 			System.out.println("Couldn't find file");
 			e.printStackTrace();
 		}

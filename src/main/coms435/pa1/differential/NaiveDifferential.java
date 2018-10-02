@@ -1,8 +1,9 @@
 package coms435.pa1.differential;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 
 public class NaiveDifferential
 {
@@ -18,30 +19,32 @@ public class NaiveDifferential
 
 	public Object retrieveRecord(String key) {
 		try {
-			//or path to DiffFile.txt
-			File diff = new File(diffPath);
-			Scanner diffScanner = new Scanner(diff);
-			while(diffScanner.hasNextLine()) {
-				String line = diffScanner.nextLine();
+			BufferedReader br = new BufferedReader(new FileReader(diffPath));
+    		String line = "";
+			while((line=br.readLine())!=null) {
 				if(line.contains(key)) {
-					diffScanner.close();
+					br.close();
 					return line;
 				}
 			}
-			diffScanner.close();
+			br.close();
+		} catch (IOException e) {
+			System.out.println("Couldn't find file");
+			e.printStackTrace();
+		}
 			//or path to database.txt
-			File database = new File(databasePath);
-			Scanner dbScanner = new Scanner(database);
-			while(dbScanner.hasNextLine()) {
-				String line = dbScanner.nextLine();
+		try {	
+			BufferedReader brDB = new BufferedReader(new FileReader(databasePath));
+    		String line = "";
+			while((line=brDB.readLine())!=null) {
 				if(line.contains(key)) {
-					dbScanner.close();
+					brDB.close();
 					return line;
 				}
 			}
-			dbScanner.close();
+			brDB.close();
 			System.out.println("Key does not exist in database");
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			System.out.println("Couldn't find file");
 			e.printStackTrace();
 		}
