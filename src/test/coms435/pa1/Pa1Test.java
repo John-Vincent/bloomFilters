@@ -3,6 +3,7 @@ package coms435.pa1;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.BufferedReader;
+import java.util.Scanner;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.regex.Matcher;
@@ -14,6 +15,9 @@ public class Pa1Test
     public static int[] count;
 
     public static ArrayList<String> s = new ArrayList<String>();
+
+    private static HashMap<String,Integer> h = new HashMap<String,Integer>();
+
 
     public static void main(String[] args)
     {
@@ -41,25 +45,39 @@ public class Pa1Test
 
         fillArrayList(f);
         CMS cms = new CMS(e, d, s);
-        System.out.println("approx unique strings: " + cms.averageFrequency() + "\n tears: " + cms.approximateFrequency("tears") + "\nand: " + cms.approximateFrequency("and"));
+        //System.out.println("approx average frequency: " + cms.averageFrequency() + "\n tears: " + cms.approximateFrequency("tears") + "\nand: " + cms.approximateFrequency("and"));
+        Scanner sc = new Scanner(System.in);
 
-        for(int i = 3; i < args.length; i+=2)
+        while(true)
         {
-            float q=0, r=0;
-            if(args.length > 2)
-            try
+            System.out.print("waiting for hh or freq cmd: ");
+            String cmd = sc.next();
+            float q, r;
+
+            switch(cmd)
             {
-                q = Float.parseFloat(args[i]);
-                r = Float.parseFloat(args[i+1]);
+                case "HH":
+                case "hh":
+                case "heavy hitter":
+                    q = sc.nextFloat();
+                    r = sc.nextFloat();
+                    heavyHitter(cms, q, r);
+                    break;
+                case "frequency":
+                case "freq":
+                    cmd = sc.next();
+                    System.out.println("calculating freq of: " + cmd);
+                    System.out.println("\tapprox: " + cms.approximateFrequency(cmd) + " actual: " + h.get(cmd));
+                    break;
+                case "exit":
+                case "close":
+                case "bye":
+                case "quit":
+                    cms.shutdown();
+                    System.exit(-1);
+                    break;
             }
-            catch(Exception ex)
-            {
-                System.out.println("argument must be numerical value: " + args[i] + ", " + args[i+1]);
-                System.exit(-1);
-            }
-            heavyHitter(cms, q, r);
         }
-        cms.shutdown();
     }
 
     public static void approx(CMS cms)
@@ -80,7 +98,6 @@ public class Pa1Test
     {
         String string;
         String t;
-        HashMap<String,Integer> h = new HashMap<String,Integer>();
         Pattern p = Pattern.compile("[a-zA-Z0-9']{3,}");
         Matcher m;
         try {
@@ -103,7 +120,7 @@ public class Pa1Test
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(h.keySet().size());
-        System.out.println(s.get(s.size()/2) + ": " + h.get(s.get(s.size()/2)) + "\nand: " + h.get("and") );
+        //System.out.println(h.keySet().size());
+        //System.out.println(s.get(s.size()/2) + ": " + h.get(s.get(s.size()/2)) + "\nand: " + h.get("and") );
     }
 }
