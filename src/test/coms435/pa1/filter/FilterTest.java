@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FilterTest
 {
@@ -50,20 +52,22 @@ public class FilterTest
     public static void readFile(String pathname)
     {
         File f = new File(pathname);
-        String s;
-        try
-        {
+        String string;
+        String t;
+        Pattern p = Pattern.compile("[a-zA-Z0-9']{3,}");
+        Matcher m;
+        try {
             BufferedReader reader = Files.newBufferedReader(f.toPath());
-            s = reader.readLine();
-            while(s != null && file.size() < NUM_STRINGS)
-            {
-                if( Math.random() > .5)
-                    file.add(s);
-                s = reader.readLine();
+            string = reader.readLine();
+            while (string != null) {
+                m = p.matcher(string);
+                while (m.find()) {
+                    t = m.group().toLowerCase();
+                    file.add(t);
+                }
+                string = reader.readLine();
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -72,11 +76,11 @@ public class FilterTest
     {
         readFile(args[0]);
         System.out.println(RanTest());
-        BloomFilter b = new BloomFilterRan(file.size(), 50 * 8);
+        BloomFilter b = new BloomFilterRan(file.size(), 4);
         ShakeTest(b);
-        b = new BloomFilterFNV(file.size(), 50*8);
+        b = new BloomFilterFNV(file.size(), 8);
         ShakeTest(b);
-        b = new BloomFilterMurmur(file.size(), 50 * 8);
+        b = new BloomFilterMurmur(file.size(), 10);
         ShakeTest(b);
         BloomFilterAbstract.shutdown();
     }

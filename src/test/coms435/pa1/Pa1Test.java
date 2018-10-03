@@ -50,7 +50,7 @@ public class Pa1Test
 
         while(true)
         {
-            System.out.print("waiting for hh or freq cmd: ");
+            System.out.print("hh, freq, avg, or unique cmd: ");
             String cmd = sc.next();
             float q, r;
 
@@ -74,17 +74,18 @@ public class Pa1Test
                 case "bye":
                 case "quit":
                     cms.shutdown();
+                    sc.close();
                     System.exit(-1);
                     break;
+                case "avg":
+                    System.out.println("calculating average frequency");
+                    System.out.println("\t" + cms.averageFrequency());
+                    break;
+                case "unique":
+                case "distinct":
+                    System.out.println("unique elements\n\tapprox: " + cms.approximateDistinct() + " actual: " + h.keySet().size());
+                    break;
             }
-        }
-    }
-
-    public static void approx(CMS cms)
-    {
-        for(int i = 0; i < s.size(); i++)
-        {
-            //System.out.println(strings[i] + "\n\tapproximate frequency: " + cms.approximateFrequency(strings[i]) + "\n\tactual frequency: " + count[i]);
         }
     }
 

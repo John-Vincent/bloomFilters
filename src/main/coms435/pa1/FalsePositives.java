@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
 import coms435.pa1.filter.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FalsePositives
 {
@@ -27,7 +29,7 @@ public class FalsePositives
      */
     public static void main(String[] args)
     {
-        int max = Integer.MAX_VALUE;
+        int max = 1000;
         BloomFilter b;
 
         if(args.length < 1)
@@ -50,12 +52,24 @@ public class FalsePositives
         }
 
         readFile(args[0], max);
-        b = new BloomFilterRan(strings_in.size(), max_length * 8);
-        FPTest(b);
-        b = new BloomFilterFNV(strings_in.size(), max_length * 8);
-        FPTest(b);
-        b = new BloomFilterMurmur(strings_in.size(), max_length * 8);
-        FPTest(b);
+        b = new BloomFilterRan(strings_in.size(), 4);
+        FPTest(b, 4);
+        b = new BloomFilterRan(strings_in.size(), 8);
+        FPTest(b, 8);
+        b = new BloomFilterRan(strings_in.size(), 10);
+        FPTest(b, 10);
+        b = new BloomFilterFNV(strings_in.size(), 4);
+        FPTest(b, 4);
+        b = new BloomFilterFNV(strings_in.size(), 8);
+        FPTest(b, 8);
+        b = new BloomFilterFNV(strings_in.size(), 10);
+        FPTest(b, 10);
+        b = new BloomFilterMurmur(strings_in.size(), 4);
+        FPTest(b, 4);
+        b = new BloomFilterMurmur(strings_in.size(), 8);
+        FPTest(b, 8);
+        b = new BloomFilterMurmur(strings_in.size(), 10);
+        FPTest(b, 10);
         BloomFilterAbstract.shutdown();
     }
 
@@ -66,10 +80,10 @@ public class FalsePositives
      * then that is a false positive.
      * @param r
      */
-    public static void FPTest(BloomFilter r)
+    public static void FPTest(BloomFilter r, int n)
     {
         double fp = 0;
-        System.out.println(r.getClass() + " test:\n\tstarting adding " + strings_in.size() + " strings");
+        System.out.println(r.getClass() + " test: " + n + " bits per element");
         for(int i= 0; i < strings_in.size(); i++)
         {
             r.add(strings_in.get(i));
@@ -80,14 +94,14 @@ public class FalsePositives
         {
             if(r.appears(strings_out.get(i)))
             {
-                System.out.println("\tfailed on string: " + strings_out.get(i));
+                //System.out.println("\tfailed on string: " + strings_out.get(i) + "           ");
                 fp++;
             }
             System.out.print("\tchecked index " + i + " of " + (strings_out.size() - 1) + "\r");
         }
         //this is in case it is not evenly divisible
         fp = fp / strings_out.size();
-        System.out.println("\n" + r.getClass() + " result:\n\tfalse positive percentage: " + fp*100);
+        System.out.println("\tresult: false positive percentage: " + fp*100 + "\n");
     }
 
     /**
@@ -99,30 +113,25 @@ public class FalsePositives
     public static void readFile(String pathname, int NUM_STRINGS)
     {
         File f = new File(pathname);
-        String s;
-        try
-        {
+        String string;
+        String t;
+        Pattern p = Pattern.compile("[a-zA-Z0-9']{3,}");
+        Matcher m;
+        try {
             BufferedReader reader = Files.newBufferedReader(f.toPath());
-            s = reader.readLine();
-            while (s != null)
-            {
-                if (Math.random() > .5 && strings_in.size() < NUM_STRINGS)
-                {
-                    strings_in.add(s);
-                    if(s.length() > max_length)
-                    {
-                        max_length = s.length();
-                    }
+            string = reader.readLine();
+            while (string != null) {
+                m = p.matcher(string);
+                while (m.find()) {
+                    t = m.group().toLowerCase();
+                    if(strings_in.size() < NUM_STRINGS)
+                        strings_in.add(t);
+                    else if (!strings_in.contains(t))
+                        strings_out.add(t);
                 }
-                else if(!strings_in.contains(s))
-                {
-                    strings_out.add(s);
-                }
-                s = reader.readLine();
+                string = reader.readLine();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

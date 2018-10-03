@@ -19,18 +19,24 @@ public class CMS
 
     private BFHash[] hashes;
 
-    private ArrayList<String> s;
+    private double overEstimate;
+
+    private ArrayList<String> s = new ArrayList<String>();
 
     public CMS(float epsilon, float delta, ArrayList<String> s)
     {
+        overEstimate = epsilon * delta * s.size();
+        overEstimate = overEstimate > 0 ? overEstimate : 1;
         this.counters = new int[(int)(2l/epsilon)][(int)(LN_2 / delta)];
         this.hashes = new BFHash[(int)(2l/epsilon)];
+        int min = Integer.MAX_VALUE;
         int[] hash;
-        this.s = s;
         for(int i = 0; i < this.hashes.length; i++)
         {
             this.hashes[i] = new MurHash();
             this.hashes[i].generateFunction(this.counters[0].length, 1, 1);
+            //this allows us to make sure each hash set gets applied to the same row even though they might finish out of order.
+            this.hashes[i].setIndex(i);
             this.hashes[i].setQueue(queue);
         }
         for(int i = 0; i < s.size(); i++)
@@ -42,6 +48,7 @@ public class CMS
                 try
                 {
                     hash = this.queue.take();
+                    min = min > this.counters[hash[1]][hash[0]] ? this.counters[hash[1]][hash[0]] : min;
                     this.counters[hash[1]][hash[0]]++;
                 }
                 catch(Exception e)
@@ -49,8 +56,12 @@ public class CMS
                     System.out.println("program interrupted");
                 }
             }
+            if (min*epsilon < 1)
+            {
+                this.s.add(s.get(i));
+            }
         }
-        System.out.println();
+        System.out.println("\n" + s.size());
     }
 
     public int approximateFrequency(String x)
@@ -112,16 +123,21 @@ public class CMS
         return ans;
     }
 
-    public int averageFrequency()
+    public long averageFrequency()
     {
         int size = s.size();
-        int sum = 0;
+        long sum = 0;
 
         for (int i = 0; i < s.size(); i++)
         {
                 sum += this.approximateFrequency(s.get(i));
         }
         return sum/size;
+    }
+
+    public int approximateDistinct()
+    {
+        return (int)(s.size() / averageFrequency() * overEstimate);
     }
 
     public void shutdown()
@@ -140,7 +156,6 @@ public class CMS
         for (int i = 0; i < hashes.length; i++)
         {
             hashes[i].setString(s);
-            hashes[i].setIndex(i);
             threads.execute(hashes[i]);
         }
     }

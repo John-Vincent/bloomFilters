@@ -39,6 +39,12 @@ public abstract class BloomFilterAbstract implements BloomFilter
         this.table.clear();
     }
 
+    /**
+     * this function is used to set the BFHash implementation
+     * that should be used with this bloom filter
+     * @param c a constructor of the BFHash that should be
+     *          used constructor must not take any parameters
+     */
     protected void setHashFunction(Constructor<? extends BFHash> c)
     {
         double size = LN_2 * bitsPerElement;
@@ -152,7 +158,13 @@ public abstract class BloomFilterAbstract implements BloomFilter
         return this.hashes.size();
     }
 
-    public static  void shutdown()
+    /**
+     * this function is used to close the thread pool that is
+     * used for executing the hash functions.
+     * without calling this function the program will not close
+     * normally.
+     */
+    public static void shutdown()
     {
         threads.shutdown();
     }
