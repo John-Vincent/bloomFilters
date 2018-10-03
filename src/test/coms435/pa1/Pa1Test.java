@@ -45,7 +45,6 @@ public class Pa1Test
 
         fillArrayList(f);
         CMS cms = new CMS(e, d, s);
-        //System.out.println("approx average frequency: " + cms.averageFrequency() + "\n tears: " + cms.approximateFrequency("tears") + "\nand: " + cms.approximateFrequency("and"));
         Scanner sc = new Scanner(System.in);
 
         while(true)

@@ -10,7 +10,6 @@ import coms435.pa1.differential.NaiveDifferential;
 import coms435.pa1.filter.BloomFilterFNV;
 import coms435.pa1.filter.BloomFilterMurmur;
 import coms435.pa1.filter.BloomFilterRan;
-import java.lang.instrument.Instrumentation;
 
 public class EmpericalComparison {
 
@@ -20,7 +19,6 @@ public class EmpericalComparison {
 	private String databaseFilePath;
 	private int setSize;
 	private int bitsPerElement;
-	private static Instrumentation instrumentation;
 
 	public EmpericalComparison(String keysFilePath, String diffFilePath, String databaseFilePath, int setSize, int bitsPerElement){
 		this.diffFilePath = diffFilePath;
@@ -95,13 +93,7 @@ public class EmpericalComparison {
 		return new NaiveDifferential(diffFilePath,databaseFilePath);
 	}
 
-	public static void premain(String args, Instrumentation inst) {
-		instrumentation = inst;
-	}
-
 	public static void main(String[] args) throws InterruptedException {
-		System.out.println(instrumentation);
-		System.exit(-1);
 		EmpericalComparison comp = new EmpericalComparison( args[0], args[1], args[2], 400000, 4);
 
 		System.out.println("Ran Bloom Differential average time in ns: " + comp.averageBloomTime(comp.getBloomRan()));

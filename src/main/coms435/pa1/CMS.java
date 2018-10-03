@@ -19,14 +19,13 @@ public class CMS
 
     private BFHash[] hashes;
 
-    private double overEstimate;
-
     private ArrayList<String> s = new ArrayList<String>();
+
+    private int size;
 
     public CMS(float epsilon, float delta, ArrayList<String> s)
     {
-        overEstimate = epsilon * delta * s.size();
-        overEstimate = overEstimate > 0 ? overEstimate : 1;
+        this.size = s.size();
         this.counters = new int[(int)(2l/epsilon)][(int)(LN_2 / delta)];
         this.hashes = new BFHash[(int)(2l/epsilon)];
         int min = Integer.MAX_VALUE;
@@ -56,12 +55,12 @@ public class CMS
                     System.out.println("program interrupted");
                 }
             }
-            if (min*epsilon < 1)
+            if (min - epsilon*i*delta < 1)
             {
                 this.s.add(s.get(i));
             }
+            min = Integer.MAX_VALUE;
         }
-        System.out.println("\n" + s.size());
     }
 
     public int approximateFrequency(String x)
@@ -88,10 +87,9 @@ public class CMS
 
     public ArrayList<String> approximateHeavyHitter(float q, float r)
     {
-        //>= qN  < rN
         ArrayList<String> ans = new ArrayList<String>();
-        float qn = q * this.s.size();
-        float rn = r * this.s.size();
+        float qn = q * this.size;
+        float rn = r * this.size;
         int frequency;
 
         for (int i = 0; i < s.size(); i++)
@@ -137,7 +135,8 @@ public class CMS
 
     public int approximateDistinct()
     {
-        return (int)(s.size() / averageFrequency() * overEstimate);
+
+        return s.size();
     }
 
     public void shutdown()
