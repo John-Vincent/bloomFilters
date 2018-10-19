@@ -24,8 +24,13 @@ public class RanHash extends BFHash
     @Override
     public void generateFunction(int t, int N, double k)
     {
+        int primes = (int)(Math.random() * 1000);
         this.max = t*N;
-        this.p = nextPrime(max);
+        this.p = this.max;
+        for(int i = 0; i < primes; i++)
+        {
+            this.p = nextPrime(this.p + 1);
+        }
         this.a = (long)(Math.random() * Long.MAX_VALUE);
         this.a = this.a % this.p;
         this.b = (long) (Math.random() * Long.MAX_VALUE);

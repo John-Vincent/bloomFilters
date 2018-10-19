@@ -41,4 +41,14 @@ public abstract class BFHash implements Runnable
     {
         return 0;
     }
+
+    public int getHash(String s)
+    {
+        int ans;
+        String temp = this.s;
+        this.s = s;
+        ans = this.getHash();
+        this.s = temp;
+        return ans;
+    }
 }

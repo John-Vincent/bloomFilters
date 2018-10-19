@@ -40,8 +40,11 @@ public class FilterTest
         {
             if(r.appears(file.get(i)))
                 appear++;
-            if(!r.appears(file.get(i) + "bananas"))
+            if(!r.appears(file.get(i) + "bananas")){
                 not++;
+            } else {
+                System.out.println("\t failed on string " + file.get(i));
+            }
             System.out.print("checked index " + i + "\r");
         }
         appear = appear/file.size();

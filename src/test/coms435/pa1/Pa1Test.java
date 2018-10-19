@@ -14,7 +14,7 @@ public class Pa1Test
 
     public static int[] count;
 
-    public static ArrayList<String> s = new ArrayList<String>();
+    public static ArrayList<String> s = null;
 
     private static HashMap<String,Integer> h = new HashMap<String,Integer>();
 
@@ -43,7 +43,7 @@ public class Pa1Test
             System.exit(-1);
         }
 
-        fillArrayList(f);
+        s = fillArrayList(f);
         CMS cms = new CMS(e, d, s);
         Scanner sc = new Scanner(System.in);
 
@@ -94,8 +94,9 @@ public class Pa1Test
         System.out.println("\t" + cms.approximateHeavyHitter(q, r));
     }
 
-    public static void fillArrayList(File f)
+    public static ArrayList<String> fillArrayList(File f)
     {
+        ArrayList<String> s = new ArrayList<String>();
         String string;
         String t;
         Pattern p = Pattern.compile("[a-zA-Z0-9']{3,}");
@@ -120,6 +121,8 @@ public class Pa1Test
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return s;
         //System.out.println(h.keySet().size());
         //System.out.println(s.get(s.size()/2) + ": " + h.get(s.get(s.size()/2)) + "\nand: " + h.get("and") );
     }
